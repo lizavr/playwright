@@ -8,6 +8,7 @@ enum usingConstants {
   EMAIL_2 = 'pwpw4554@gmail.com',
   PASSWORD_2 = 'aA234aA123',
   MAINGMAIL = 'https://www.google.com/intl/en/gmail/about/',
+  STORE = 'https://rus-buket.ru/cvety',
 }
 
 // test('send email flow', async ({ page }) => {
@@ -50,51 +51,88 @@ enum usingConstants {
 //   await expect(message).toBeVisible();
 // });
 
-test('send email to other acc', async () => {
-  const browser = await chromium.launch({ headless: false, channel: 'msedge' });
+// test('send email to other acc', async () => {
+//   const browser = await chromium.launch({ headless: false, channel: 'msedge' });
 
-  const login = async (page, email, password) => {
-    await page.goto(usingConstants.MAINGMAIL);
-    await page.locator('a:text("Sign in")').click();
-    await page.waitForSelector('input[type = "email"]');
-    await page.locator('input[type = "email"]').fill(email);
-    const nextBtn = await page.locator(':text("Next")');
-    await nextBtn.click();
-    await page.waitForSelector('input[type = "password"]');
-    await page.locator('input[type = "password"]').fill(password);
-    await nextBtn.click();
-    await page_1.waitForSelector(':text("Compose")');
-  };
+//   const login = async (page, email, password) => {
+//     await page.goto(usingConstants.MAINGMAIL);
+//     await page.locator('a:text("Sign in")').click();
+//     await page.waitForSelector('input[type = "email"]');
+//     await page_1.waitForTimeout(500);
+//     await page.locator('input[type = "email"]').fill(email);
+//     await page_1.waitForTimeout(500);
+//     const nextBtn = await page.locator(':text("Next")');
+//     await nextBtn.click();
+//     await page.waitForSelector('input[type = "password"]');
+//     await page_1.waitForTimeout(500);
+//     await page.locator('input[type = "password"]').fill(password);
+//     await page_1.waitForTimeout(500);
+//     await nextBtn.click();
+//     await page_1.waitForSelector(':text("Compose")');
+//   };
 
-  const context_1 = await browser.newContext();
-  const page_1 = await context_1.newPage();
+//   const context_1 = await browser.newContext();
+//   const page_1 = await context_1.newPage();
 
-  await login(page_1, usingConstants.EMAIL_1, usingConstants.PASSWORD_1);
+//   await login(page_1, usingConstants.EMAIL_1, usingConstants.PASSWORD_1);
 
-  await page_1.getByText('Compose').click();
+//   await page_1.getByText('Compose').click();
 
-  const msg = Guid.create().toString().slice(0, 16);
-  const title = Guid.create().toString().slice(0, 16);
+//   const msg = Guid.create().toString().slice(0, 16);
+//   const title = Guid.create().toString().slice(0, 16);
 
-  await page_1.waitForSelector(':text("New Message")');
-  await page_1.keyboard.type(usingConstants.EMAIL_2);
-  await page_1.keyboard.press('Enter');
-  await page_1.keyboard.press('Tab');
-  await page_1.keyboard.type(`${title.toString()}`);
-  await page_1.keyboard.press('Tab');
-  await page_1.keyboard.type(`${msg.toString()}`);
-  await page_1.keyboard.press('Control+Enter');
+//   await page_1.waitForSelector(':text("New Message")');
+//   await page_1.waitForTimeout(500);
+//   await page_1.keyboard.type(usingConstants.EMAIL_2);
+//   await page_1.keyboard.press('Enter');
+//   await page_1.keyboard.press('Tab');
+//   await page_1.keyboard.type(`${title.toString()}`);
+//   await page_1.keyboard.press('Tab');
+//   await page_1.keyboard.type(`${msg.toString()}`);
+//   await page_1.keyboard.press('Control+Enter');
 
-  const context_2 = await browser.newContext();
-  const page_2 = await context_2.newPage();
+//   const context_2 = await browser.newContext();
+//   const page_2 = await context_2.newPage();
 
-  await login(page_2, usingConstants.EMAIL_2, usingConstants.PASSWORD_2);
+//   await login(page_2, usingConstants.EMAIL_2, usingConstants.PASSWORD_2);
+//   const titleWithMsg = `:text("${title.toString()} - ${msg.toString()}")`;
 
-  const titleWithMsg = `:text("${title.toString()} - ${msg.toString()}")`;
-  // page_2.getByText(titleWithMsg);
-  await page_2.click(titleWithMsg);
+//   await page_2.getByText(titleWithMsg);
 
-  const message = await page_2.getByText(msg.toString(), { exact: true });
-  await page_2.screenshot({ path: 'screenshots/screenshot1.png' });
-  await expect(message).toBeVisible();
+//   await page_2.reload();
+
+//   await page_2.click(titleWithMsg);
+
+//   const message = await page_2.getByText(msg.toString(), { exact: true });
+//   await page_2.screenshot({ path: 'screenshots/screenshot1.png' });
+//   await expect(message).toBeVisible();
+// });
+
+test('swiper test', async () => {
+  const browser = await chromium.launch({
+    headless: false,
+    channel: 'chrome',
+    timeout: 50000,
+  });
+
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.goto(usingConstants.STORE);
+  await page.waitForLoadState('load');
+
+  const rangeEl = await page.locator('.noUi-base');
+  const boundingBoxEl = await rangeEl.boundingBox();
+  if (!boundingBoxEl) {
+    return;
+  }
+  await rangeEl.dragTo(rangeEl, {
+    force: true,
+    targetPosition: { x: boundingBoxEl.width * 0.5, y: boundingBoxEl.y },
+  });
+
+  const inputFrom = await page.locator('#js_rb-filter__price-from');
+  const inputValue = await inputFrom.inputValue();
+
+  await expect(inputValue).toEqual("10000");
 });
