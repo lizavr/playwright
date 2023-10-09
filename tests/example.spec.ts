@@ -1,5 +1,7 @@
-import { test, expect, chromium } from '@playwright/test';
+import { test, expect, chromium, firefox, Browser, Page } from '@playwright/test';
+import {toMatchImageSnapshot} from 'jest-image-snapshot';
 import { Guid } from 'guid-typescript';
+import ssim from "ssim.js";
 
 enum usingConstants {
   EMAIL_1 = 'pwpw81908@gmail.com',
@@ -108,31 +110,151 @@ enum usingConstants {
 //   await expect(message).toBeVisible();
 // });
 
-test('swiper test', async () => {
-  const browser = await chromium.launch({
+// test('swiper test', async () => {
+//   const browser = await chromium.launch({
+//     headless: false,
+//     channel: 'chrome',
+//     timeout: 50000,
+//   });
+
+//   const context = await browser.newContext();
+//   const page = await context.newPage();
+
+//   await page.goto(usingConstants.STORE);
+//   await page.waitForLoadState('load');
+
+//   const rangeEl = await page.locator('.noUi-base');
+//   const boundingBoxEl = await rangeEl.boundingBox();
+//   if (!boundingBoxEl) {
+//     return;
+//   }
+//   await rangeEl.dragTo(rangeEl, {
+//     force: true,
+//     targetPosition: { x: boundingBoxEl.width * 0.5, y: boundingBoxEl.y },
+//   });
+
+//   const inputFrom = await page.locator('#js_rb-filter__price-from');
+//   const inputValue = await inputFrom.inputValue();
+
+//   await expect(inputValue).toEqual('10000');
+// });
+
+// test('dark scheme', async () => {
+//   const browser = await chromium.launch({
+//     headless: false,
+//     channel: 'chrome',
+//     timeout: 50000,
+//   });
+
+//   const context = await browser.newContext({
+//     colorScheme: 'dark',
+//   });
+
+//   const page = await context.newPage();
+
+//   await page.goto('https://playwright.dev/docs/intro');
+
+//   const logo = await page.locator('.navbar__brand');
+//   await page.waitForTimeout(5000);
+//   await expect(logo).toHaveCSS('display', 'flex');
+// });
+
+// test('compare screen', async () => {
+//   const browser = await chromium.launch({
+//     headless: false,
+//     channel: 'chrome',
+//     timeout: 50000,
+//   });
+
+//   const context = await browser.newContext();
+//   const page = await context.newPage();
+
+//   await page.goto('https://playwright.dev/docs/intro');
+//   const screen1 = await page.screenshot({
+//     path: 'screenshots/screenshot1.png',
+//   });
+
+//   expect(screen1).toMatchSnapshot('111.png');
+// });
+
+
+test('compare screen', async () => {
+  const browser = await firefox.launch({
     headless: false,
-    channel: 'chrome',
+    channel: 'firefox',
     timeout: 50000,
   });
 
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  await page.goto(usingConstants.STORE);
-  await page.waitForLoadState('load');
-
-  const rangeEl = await page.locator('.noUi-base');
-  const boundingBoxEl = await rangeEl.boundingBox();
-  if (!boundingBoxEl) {
-    return;
-  }
-  await rangeEl.dragTo(rangeEl, {
-    force: true,
-    targetPosition: { x: boundingBoxEl.width * 0.5, y: boundingBoxEl.y },
+  await page.goto('https://learn.javascript.ru/');
+  const screen1 = await page.screenshot({
+    path: 'screenshots/screenshot1.png',
   });
 
-  const inputFrom = await page.locator('#js_rb-filter__price-from');
-  const inputValue = await inputFrom.inputValue();
-
-  await expect(inputValue).toEqual("10000");
+  expect(screen1).toMatchSnapshot('test3.png', {maxDiffPixels: 12});
 });
+
+// test('compare screen 2', async () => {
+//   const browser = await firefox.launch({
+//     headless: false,
+//     channel: 'firefox',
+//     timeout: 50000,
+//   });
+
+//   const context = await browser.newContext();
+//   const page = await context.newPage();
+
+//   await page.goto('https://learn.javascript.ru/');
+  
+//   const jestState = {
+//     testPath: "some-path-to-your-test-file.ts", // This is used to determine where the snapshot file should be saved.
+//     currentTestName: "Your Test Name",
+//     isNot: false,
+//     snapshotState: {
+//       _counters: new Map(),
+//       _updateSnapshot: 'new', // "none" for no updates, "all" for forced update, "new" for adding only new snapshots
+//       updated: undefined,
+//       added: true,
+//       match: undefined,
+//       key: undefined
+//     },
+//   };
+  
+//   // Extend expect:
+//   expect.extend({ toMatchImageSnapshot: toMatchImageSnapshot.bind(null, jestState) });
+
+//   const screen1 = await page.screenshot();
+
+//   const screenshotBuffer = await page.screenshot({ encoding: 'binary' });
+
+//   // Assuming img2 is your reference image as Uint8Array or Uint8ClampedArray
+//   const { mssim, performance } = ssim(new Uint8ClampedArray(screenshotBuffer.buffer), img2);
+//   //await expect(screen1).toMatchImageSnapshot({maxDiffPixels: 12});
+// });
+
+// test('compare screen', async () => {
+
+// let browser: Browser;
+// let page: Page;
+
+// beforeAll(async () => {
+//   browser = await chromium.launch();
+//   page = await browser.newPage();
+// });
+
+// afterAll(async () => {
+//   await browser.close();
+// });
+
+// it('сравнивает скриншоты', async () => {
+//   await page.goto('https://yourwebsite.com');
+//   const screenshot = await page.screenshot();
+
+//   expect(screenshot).toMatchImageSnapshot({
+//     customSnapshotsDir: './path-to-reference-screenshots',
+//     customDiffDir: './path-to-diffs',
+//   });
+// });
+// });
